@@ -6,6 +6,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./Components/Pages/Login";
 import Register from "./Components/Pages/Register";
 import Home from "./Components/Pages/Home";
+import ChatRooms from "./Components/ChatRoom/ChatRooms";
 
 function App() {
   
@@ -21,6 +22,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/room/:id"
+          element={
+            <ProtectedRoute>
+              <ChatRooms />
             </ProtectedRoute>
           }
         />
