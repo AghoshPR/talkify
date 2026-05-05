@@ -13,6 +13,7 @@ class RegisterView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             return Response({"message": "User created successfully"}, status=201)
+        return Response(serializer.errors,status=400)
 
 
 class LoginView(APIView):

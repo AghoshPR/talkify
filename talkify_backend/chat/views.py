@@ -1,3 +1,6 @@
-from django.shortcuts import render
+# chat/views.py
 
-# Create your views here.
+from django.http import HttpResponse
+
+def chat_home(request):
+    return HttpResponse("Chat working")

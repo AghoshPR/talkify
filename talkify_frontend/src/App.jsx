@@ -1,13 +1,14 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Home from "./pages/Home";
+
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import Login from "./Components/Pages/Login";
+import Register from "./Components/Pages/Register";
+import Home from "./Components/Pages/Home";
 
 function App() {
-  const [count, setCount] = useState(0);
+  
 
   return (
     <BrowserRouter>
@@ -16,7 +17,7 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         <Route
-          path="/"
+          path="/home"
           element={
             <ProtectedRoute>
               <Home />
