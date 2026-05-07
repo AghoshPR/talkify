@@ -5,7 +5,6 @@ from datetime import timedelta
 import dj_database_url
 
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -31,7 +30,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'authentication',
     'chat',
-    'rooms'
+    'rooms',
+    'daphne',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -63,13 +64,34 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'talkify.wsgi.application'
+ASGI_APPLICATION = "talkify.asgi.application"
+
+if config("ENV", default="local") == "production":
+
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+
+            "CONFIG": {
+                "hosts": [config("REDIS_URL")],
+            },
+        },
+    }
+
+else:
+
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        },
+    }
 
 
 # Database
 
 
 if config("ENV", default="local") == "production":
-    
+
     DATABASES = {
         'default': dj_database_url.parse(config('DATABASE_URL'))
     }
