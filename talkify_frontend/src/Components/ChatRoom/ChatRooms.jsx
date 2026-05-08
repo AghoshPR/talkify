@@ -11,16 +11,23 @@ const ChatRooms = () => {
   const [message, setMessage] = useState("");
 
   const [messages, setMessages] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+
+  const [roomName, setRoomName] = useState("");
+  const [roomDescription, setRoomDescription] = useState("");
 
   const socketRef = useRef(null);
-
-  // TEMP ROOM NAME
-  const roomName = "General Discussion";
-
-  // TEMP USERS
-  const mockUsers = ["Alice", "Bob", "Charlie"];
+  const messagesEndRef = useRef(null);
 
   const currentUsername = localStorage.getItem("username");
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleExit = () => {
     navigate("/home");
@@ -52,6 +59,20 @@ const ChatRooms = () => {
 
     fetchMessages();
 
+    const fetchRoomDetails = async () => {
+      try {
+        const res = await Api.get(`rooms/${id}/`);
+
+        setRoomName(res.data.name);
+
+        setRoomDescription(res.data.description);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchRoomDetails();
+
     // =========================
     // WEBSOCKET URL
     // =========================
@@ -78,25 +99,31 @@ const ChatRooms = () => {
 
     socketRef.current.onopen = () => {
       console.log("WebSocket Connected");
+      socketRef.current.send(
+        JSON.stringify({
+          type: "join",
+          username: currentUsername,
+        }),
+      );
     };
 
     // RECEIVE MESSAGE
     socketRef.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
 
-      const newMessage = {
-        id: Date.now(),
+      if (data.type === "user_list_update") {
+        setOnlineUsers(data.users);
+      } else if (data.message) {
+        const newMessage = {
+          id: Date.now(),
+          sender: data.sender,
+          text: data.message,
+          time: new Date().toLocaleTimeString(),
+          isMe: data.sender === currentUsername,
+        };
 
-        sender: data.sender,
-
-        text: data.message,
-
-        time: new Date().toLocaleTimeString(),
-
-        isMe: data.sender === currentUsername,
-      };
-
-      setMessages((prev) => [...prev, newMessage]);
+        setMessages((prev) => [...prev, newMessage]);
+      }
     };
 
     socketRef.current.onclose = () => {
@@ -135,11 +162,14 @@ const ChatRooms = () => {
         </div>
 
         <div className="users-list-container">
-          <h3 className="users-title">Online Users ({mockUsers.length + 1})</h3>
+          <h3 className="users-title">Online Users ({onlineUsers.length})</h3>
 
           <ul className="users-list">
-            {mockUsers.map((user, index) => (
-              <li key={index} className="user-item">
+            {onlineUsers.map((user, index) => (
+              <li
+                key={index}
+                className={`user-item ${user === currentUsername ? "current-user" : ""}`}
+              >
                 <div className="user-avatar">{user.charAt(0)}</div>
 
                 <span className="user-name">{user}</span>
@@ -147,16 +177,6 @@ const ChatRooms = () => {
                 <span className="status-dot"></span>
               </li>
             ))}
-
-            {/* CURRENT USER */}
-
-            <li className="user-item current-user">
-              <div className="user-avatar">{currentUsername?.charAt(0)}</div>
-
-              <span className="user-name">{currentUsername}</span>
-
-              <span className="status-dot"></span>
-            </li>
           </ul>
         </div>
       </aside>
@@ -167,6 +187,8 @@ const ChatRooms = () => {
         <header className="chat-header">
           <div className="room-info">
             <h2 className="chat-room-name">{roomName}</h2>
+
+            <p className="room-description">{roomDescription}</p>
 
             <span className="room-id">Room ID: {id}</span>
           </div>
@@ -203,6 +225,7 @@ const ChatRooms = () => {
               </div>
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* INPUT */}

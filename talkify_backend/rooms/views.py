@@ -27,3 +27,16 @@ class RoomListCreateView(APIView):
             "name":room.name,
             "description":room.description
         })
+    
+class RoomDetailView(APIView):
+
+    def get(self,request,room_id):
+
+        room  = Room.objects.get(id=room_id)
+
+        return Response({
+            "id":room.id,
+            "name":room.name,
+            "description":room.description
+        })
+    

@@ -19,6 +19,7 @@ const Login = () => {
       setLoading(true);
       const res = await Api.post("auth/login/", form);
 
+      localStorage.setItem("username", res.data.username);
       dispatch(loginSuccess(res.data.access));
       navigate("/home", { replace: true });
     } catch (err) {
