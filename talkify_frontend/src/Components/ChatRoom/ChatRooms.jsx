@@ -91,7 +91,7 @@ const ChatRooms = () => {
     else {
       const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
 
-      socketUrl = `${wsProtocol}://talkify.aghosh.site/ws/chat/${id}/`;
+      socketUrl = `${wsProtocol}://talkify-6mx6.onrender.com/ws/chat/${id}/`;
     }
 
     // WEBSOCKET CONNECTION
