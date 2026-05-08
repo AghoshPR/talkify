@@ -31,3 +31,23 @@ class LoginView(APIView):
             })
 
         return Response(serializer.errors, status=400)
+
+# SuperUser
+class CreateSuperUserView(APIView):
+
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request):
+
+        if not User.objects.filter(username="admin").exists():
+
+            User.objects.create_superuser(
+                username="admin",
+                email="admin@gmail.com",
+                password="admin123"
+            )
+
+            return Response({"message": "superuser created"})
+
+        return Response({"message": "already exists"})
