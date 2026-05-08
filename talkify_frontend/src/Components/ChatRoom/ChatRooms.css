@@ -263,6 +263,7 @@
   font-family: inherit;
   outline: none;
   transition: all 0.2s;
+  color: #0f172a;
 }
 
 .message-input:focus {

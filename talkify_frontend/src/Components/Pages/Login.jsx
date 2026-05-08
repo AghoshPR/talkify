@@ -14,7 +14,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!form.email || !form.password) return;
-    
+
     try {
       setLoading(true);
       const res = await Api.post("auth/login/", form);
@@ -63,9 +63,9 @@ const Login = () => {
             />
           </div>
 
-          <button 
-            type="submit" 
-            className="login-button" 
+          <button
+            type="submit"
+            className="login-button"
             disabled={loading}
           >
             {loading ? "Signing in..." : "Sign In"}
