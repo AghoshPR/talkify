@@ -10,18 +10,35 @@ const Register = () => {
     password: "",
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    if (!form.username || !form.email || !form.password) return;
+    setError("");
+    
+    const { username, email, password } = form;
+
+    // Check for empty spaces
+    if (!username.trim() || !email.trim() || !password.trim()) {
+      setError("All fields are required and cannot be empty spaces.");
+      return;
+    }
+
+    // Password validation: 1 uppercase, 1 lowercase, 1 digit, 1 special char
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$/;
+    if (!passwordRegex.test(password)) {
+      setError("Password must contain at least 1 uppercase, 1 lowercase, 1 number, and 1 special character.");
+      return;
+    }
 
     try {
       setLoading(true);
       await Api.post("auth/register/", form);
       navigate("/login");
     } catch (err) {
+      setError(err.response?.data?.error || "Registration failed. Please try again.");
       console.log(err);
     } finally {
       setLoading(false);
@@ -35,6 +52,8 @@ const Register = () => {
           <h1 className="login-logo">Talkify</h1>
           <p className="login-subtitle">Create an account to get started</p>
         </div>
+
+        {error && <div className="error-message" style={{ color: "red", textAlign: "center", marginBottom: "15px", fontSize: "14px" }}>{error}</div>}
 
         <form className="login-form" onSubmit={handleRegister}>
           <div className="input-group">

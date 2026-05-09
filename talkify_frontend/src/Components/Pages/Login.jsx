@@ -8,12 +8,18 @@ import "./Login.css";
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!form.email || !form.password) return;
+    setError("");
+
+    if (!form.email.trim() || !form.password.trim()) {
+      setError("Please fill in all fields.");
+      return;
+    }
 
     try {
       setLoading(true);
@@ -23,6 +29,7 @@ const Login = () => {
       dispatch(loginSuccess(res.data.access));
       navigate("/home", { replace: true });
     } catch (err) {
+      setError(err.response?.data?.error || "Login failed. Please check your credentials.");
       console.log(err);
     } finally {
       setLoading(false);
@@ -36,6 +43,8 @@ const Login = () => {
           <h1 className="login-logo">Talkify</h1>
           <p className="login-subtitle">Sign in to continue your conversations</p>
         </div>
+
+        {error && <div className="error-message" style={{ color: "red", textAlign: "center", marginBottom: "15px", fontSize: "14px" }}>{error}</div>}
 
         <form className="login-form" onSubmit={handleLogin}>
           <div className="input-group">

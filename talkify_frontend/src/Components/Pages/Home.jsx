@@ -11,6 +11,7 @@ const Home = () => {
   const [description, setDescription] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -35,7 +36,12 @@ const Home = () => {
 
   const handleCreateRoom = async (e) => {
     e.preventDefault();
-    if (!roomName.trim()) return;
+    setError("");
+
+    if (!roomName.trim()) {
+      setError("Room name cannot be empty or just spaces.");
+      return;
+    }
 
     try {
       setLoading(true);
@@ -46,9 +52,11 @@ const Home = () => {
 
       setRoomName("");
       setDescription("");
+      setError("");
       setIsModalOpen(false);
       fetchRooms();
     } catch (err) {
+      setError(err.response?.data?.error || "Failed to create room.");
       console.log(err);
     } finally {
       setLoading(false);
@@ -73,7 +81,7 @@ const Home = () => {
       <main className="main-content">
         <div className="page-header">
           <h2 className="page-title">Available Rooms</h2>
-          <button className="add-room-btn" onClick={() => setIsModalOpen(true)}>
+          <button className="add-room-btn" onClick={() => { setIsModalOpen(true); setError(""); setRoomName(""); setDescription(""); }}>
             + Add Room
           </button>
         </div>
@@ -105,15 +113,17 @@ const Home = () => {
 
       {/* Create Room Modal */}
       {isModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+        <div className="modal-overlay" onClick={() => { setIsModalOpen(false); setError(""); }}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Create a New Room</h3>
-              <button className="close-btn" onClick={() => setIsModalOpen(false)}>
+              <button className="close-btn" onClick={() => { setIsModalOpen(false); setError(""); }}>
                 &times;
               </button>
             </div>
             
+            {error && <div className="error-message" style={{ color: "red", textAlign: "center", marginBottom: "15px", fontSize: "14px" }}>{error}</div>}
+
             <form className="modal-form" onSubmit={handleCreateRoom}>
               <div className="form-group">
                 <label htmlFor="roomName">Room Name</label>
